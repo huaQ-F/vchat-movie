@@ -1,0 +1,78 @@
+{{extend './main.html' }}
+{{block 'main' }}
+<div class="mt-3">
+    <div class="h1 justify-content-center">电影</div>
+    <div class="table-responsive">
+        <table class="table table-hover table-bordered">
+            <thead>
+            <tr>
+                <th>分类</th>
+                <th>电影名字</th>
+                <th>封面</th>
+                <th>浏览量</th>
+                <th>创建时间</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            {{each data}}
+            <tr>
+                <td>{{$value.tag.tagName}}</td>
+                <td>{{$value.movie}}</td>
+                <td><img src={{$value.cover}} style="width:100px;" alt=""></td>
+                <td>{{$value.pv}}</td>
+                <td>{{$value.meta.createAt}}</td>
+                <td>
+                    <button class="btn btn-sm btn-danger mr-md-3" data-mid={{$value._id.toString()}} data-tid={{$value.tag._id.toString()}} onclick='del()'>删除</button>
+                    <div style="width: 150px;height: 20px;"></div>
+                    <a class="btn btn-sm btn-info" href="/add-movie/{{$value._id.toString()}}">修改</a>
+                </td>
+            </tr>
+            {{/each}}
+            </tbody>
+        </table>
+        <div class="text-right">
+            <a href="/add-movie/0" class="btn btn-sm btn-success" id="add">+</a>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- 模态框 -->
+<div class="modal fade" id="myModal">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <!-- 模态框主体 -->
+            <div class="modal-body">
+                模态框内容..
+            </div>
+
+            <!-- 模态框底部 -->
+            <div class="modal-footer">
+                <button type="button" style="display: none;" class="btn btn-secondary" id="update">确认</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="hide()">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+
+
+    function del() {
+        var mid=$(event.target).attr('data-mid')
+        var tid=$(event.target).attr('data-tid')
+        $.ajax({
+            url: '/del-movie',
+            type: 'GET',
+            data: `_id=${mid}&tid=${tid}`,
+            success: function (data) {
+                if(data.code==='001')history.go(0);
+            }
+        });
+    }
+    function up() {
+        var mid=$(event.target).attr('data-mid')
+    }
+</script>
+{{/block}}

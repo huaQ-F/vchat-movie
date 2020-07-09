@@ -1,0 +1,31 @@
+{{extend './main.html' }}
+{{block 'main' }}
+<div class="m-5 mt-3">
+    <div class="table-responsive">
+        <table class="table table-hover table-bordered">
+            <thead>
+            <tr>
+                <th>用户</th>
+                <th>邮箱</th>
+                <th>创建时间</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            {{each data}}
+            <tr>
+                <td>{{$value.uname}}</td>
+                <td>{{$value.email}}</td>
+                <td>{{$value.meta.createAt}}</td>
+                <td>
+                    <button class="btn btn-sm btn-danger" data-id="{{$value._id}}">删除</button></td>
+            </tr>
+            {{/each}}
+            </tbody>
+
+        </table>
+    </div>
+
+</div>
+
+{{/block}}

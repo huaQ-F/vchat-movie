@@ -1,0 +1,93 @@
+{{extend './main.html'}}
+{{block 'main'}}
+<div class="mt-5 mb-5">
+    <h4>{{results.tagName}}</h4>
+    <div id="list" class="row mb-3 mt-3">
+        {{each results.movieList}}
+        <div class="col-md-3 d-none d-md-block">
+            <a href="/movie-details/{{$value._id.toString()}}" class="card card-link"  style="width:100%;">
+                <img class="card-img-top" src="{{$value.cover}}" alt="Card image" style="width:100%">
+                <div class="card-body">
+                    <h5 class="text-center">{{$value.movie}}</h5>
+                    <p class="text-right" style="font-size:12px;">浏览：{{$value.pv}}</p>
+                </div>
+            </a>
+        </div>
+        <div class="d-md-none d-block">
+            <a href="/movie-details/{{$value._id.toString()}}" class="text-decoration-none text-secondary">
+            <div class="media border p-3 m-3">
+                <img src="{{$value.cover}}" alt="" style="width: 20%;" class="mr-3">
+                <div class="media-body">
+                    <h5>{{$value.movie}}</h5>
+                    <p class="p1">{{$value.desc}}</p>
+                </div>
+            </div>
+            </a>
+        </div>
+
+        {{/each}}
+    </div>
+    <div class="text-right float-right">
+        <button class="btn btn-sm btn-success d-md-block d-none" data-id="{{results._id.toString()}}" onclick="addMore()">下一页</button>
+    </div>
+    <button class="btn btn-block btn-c3 d-md-none d-block" data-id="{{results._id.toString()}}" onclick="addMore()">下一页</button>
+</div>
+<style>
+    .p1 {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+    }
+</style>
+<script>
+    var more=1
+    function addMore() {
+        var aid=$(event.target).attr('data-id')
+        $.ajax({
+            url:`/movie-tag-list/${aid}?more=${more}`,
+            type:'GET',
+            dataType:'json',
+            success:function (data) {
+                var html='';
+
+                data.movieList.forEach((item) => {
+                    var id=item._id;
+                    var cover=item.cover;
+                    var movie=item.movie;
+                    var pv=item.pv;
+                    var desc=item.desc;
+                    html+=elem(id,cover,movie,pv,desc);
+                })
+                more++;
+                $('#list').append(html)
+            }
+        })
+    }
+
+    function elem(id,cover,movie,pv,desc) {
+        var elem=`<div class="col-md-3 d-none d-md-block">
+            <a href="/movie-details/${id}" class="card card-link"  style="width:100%;">
+                <img class="card-img-top" src="${cover}" alt="Card image" style="width:100%">
+                <div class="card-body">
+                    <h5 class="text-center">${movie}</h5>
+                    <p class="text-right" style="font-size:12px;">浏览：${pv}</p>
+                </div>
+            </a>
+        </div>
+        <div class="d-md-none d-block">
+            <a href="/movie-details/${id}" class="text-decoration-none text-secondary">
+            <div class="media border p-3 m-3">
+                <img src="${cover}" alt="" style="width: 20%;" class="mr-3">
+                <div class="media-body">
+                    <h5>${movie}</h5>
+                    <p class="p1">${desc}</p>
+                </div>
+            </div>
+            </a>
+        </div>`;
+        return elem
+    }
+</script>
+{{/block}}

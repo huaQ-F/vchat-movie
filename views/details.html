@@ -1,0 +1,139 @@
+{{extend './main.html' }}
+{{block 'main' }}
+<div class="row border p-3">
+    <div class="col-md-5 col-sm-12 m-md-3 mb-sm-3">
+        <img src="{{result.cover}}" alt="" style="width: 100%;">
+    </div>
+    <div class="col-md-5 col-sm-12">
+        <p><b>电影： </b>{{result.movie}}</p>
+        <p><b>演员： </b>{{result.act}}</p>
+        <p><b>语种： </b>{{result.area}} <b>上映年份： </b>{{result.year}}</p>
+        <p><b>分类： </b>{{result.tag.tagName}} <b>评级： </b>{{result.rating}}</p>
+        <p class="p1"><b>简介： </b>{{result.desc}}</p>
+        {{if user}}
+        <div class="text-right">
+            <button id="new-comment" class="btn btn-sm btn-dark">评论</button>
+        </div>
+        <div id="template">
+            <div class="media border m-2 hide">
+                <img src="{{user.head_img}}" data-id="" data-uname="{{user.uname}}" alt="" style="width: 2.8rem;">
+                <div class="media-body">
+                    <p><b>uname</b></p>
+                    <p>content</p>
+                </div>
+            </div>
+        </div>
+        {{/if}}
+        <div class="comment">
+
+            {{if commentResult.length>0}}
+            {{each commentResult item}}
+            <div class="media border m-2" id="to-comment">
+                <img src="{{item.from_id.head_img}}" data-comment_id="{{item._id.toString()}}" data-uname="{{item.from_id.uname}}" data-id="{{item.from_id._id.toString()}}" alt="" style="width: 2.8rem;">
+                <div class="media-body">
+                    <p><b>{{item.from_id.uname}}</b></p>
+                    <p>{{item.content}}</p>
+                    {{if item.add_comment.length>0}}
+                    {{each item.add_comment}}
+                    <div class="media border m-2">
+                        <img src="{{$value.from_id.head_img}}" data-uname="{{$value.from_id.uname}}"  data-id="{{$value.from_id._id.toString()}}" alt="" style="width:2.8rem;">
+                        <div class="media-body">
+                            <p><b>{{$value.from_id.uname}}</b> 回复： <b>{{$value.to_id.uname}}</b></p>
+                            <p>{{$value.content}}</p>
+                        </div>
+                    </div>
+                    {{/each}}
+                    {{/if}}
+                </div>
+
+            </div>
+            {{/each}}
+            {{/if}}
+
+        </div>
+        {{if user}}
+        <form action="/comment-msg" id="upcomment" method="post" class="form-group mt-4 hide">
+            <input type="hidden" name="movie_id" value="{{result._id.toString()}}">
+            <input type="hidden" name="from_id" value="{{user.id.toString()}}">
+            <input type="hidden" name="toid" value="">
+            <input type="hidden" name="uname" value="{{user.uname}}">
+            <input type="hidden" name="comment_id" value="">
+
+            <textarea name="msg" cols="30" rows="2" class="form-control"></textarea>
+            <div class="mt-2">
+                <button class="btn btn-success">提交</button>
+                <button class="btn btn-dark mr-3">取消</button>
+            </div>
+        </form>
+        {{/if}}
+    </div>
+</div>
+<style>
+    .hide {
+        display: none;
+    }
+
+    .p1 {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+    }
+
+</style>
+<script>
+
+    $('#new-comment').click(function () {
+        $('#upcomment').removeClass('hide')
+        $('textarea').val('')
+        $('.comment').attr('id','comment')
+        var uname=$('#upcomment input:nth-child(4)').val()
+        $('#template p').first().html(`<b>${uname}</b>`)
+        document.documentElement.scrollTop=1903
+    })
+    $('form button').click(function (event) {
+        event.preventDefault();
+        if ($(event.target).text() === '提交') {
+            var movie_id=$('#upcomment input:nth-child(1)').val()
+            var from_id=$('#upcomment input:nth-child(2)').val()
+            var to_id=$('#upcomment input:nth-child(3)').val()
+            var comment_id=$('#upcomment input:nth-child(5)').val()
+            var content=$('textarea').val()
+            $.ajax({
+                url:'/comment-msg',
+                type:'POST',
+                data:`movie_id=${movie_id}&from_id=${from_id}&to_id=${to_id}&content=${content}&comment_id=${comment_id}`,
+                success:function (data) {
+                    if(data.code==='001'){
+                        $('#template img').attr('data-id',from_id)
+                        $('#template p').last().text(content)
+
+                        var template=$('#template').html()
+                        $('#comment').append(template)
+                        $('#comment>div').last().removeClass('hide')
+                    }else{
+                        throw('提交失败')
+                    }
+                }
+            })
+        }
+        $('#upcomment').addClass('hide')
+    })
+    $('#to-comment img').click(function (e) {
+        e.preventDefault();
+        $('#upcomment').removeClass('hide')
+        $('textarea').val('')
+        $('#comment').attr('id','')
+        $(event.target).next().attr('id','comment')
+        var id=$(event.target).attr('data-id')
+        $('#upcomment input:nth-child(3)').val(id)
+        var uname=$('#upcomment input:nth-child(4)').val()
+        var toName=$(event.target).attr('data-uname')
+        $('#template p').first().html(`<b>${uname}</b>回复： <b>${toName}</b>`)
+        var comment_id=$(event.target).attr('data-comment_id')
+        $('#upcomment input:nth-child(5)').val(comment_id)
+        document.documentElement.scrollTop=1903
+    })
+</script>
+{{/block}}

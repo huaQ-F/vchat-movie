@@ -1,0 +1,30 @@
+{{extend './main.html'}}
+{{block 'main'}}
+    <div class="list-group mt-3">
+        {{each results}}
+        {{if $value.movieList.length>0}}
+        <div class="list-group-item">
+            <div style="height: 3.6rem;">
+                <h4 class="float-left">{{$value.tagName}}</h4>
+                <div class="float-right">
+                    <a href="/movie-tag-list/{{$value._id.toString()}}" class="btn btn-sm btn-info">更多 ></a>
+                </div>
+            </div>
+            <div class="row">
+                {{each $value.movieList}}
+                <div class="col-md-3 col-12 mb-6 mb-md-0">
+                    <a href="/movie-details/{{$value._id.toString()}}" class="card card-link"  style="width:100%;">
+                        <img class="card-img-top" src="{{$value.cover}}" alt="Card image" style="width:100%">
+                        <div class="card-body">
+                            <h5 class="text-center">{{$value.movie}}</h5>
+                            <p class="text-right" style="font-size:12px;">浏览：{{$value.pv}}</p>
+                        </div>
+                    </a>
+                </div>
+                {{/each}}
+            </div>
+        </div>
+        {{/if}}
+        {{/each}}
+    </div>
+{{/block}}

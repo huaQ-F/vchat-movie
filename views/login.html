@@ -1,0 +1,14 @@
+{{extend './main.html'}}
+{{block 'main'}}
+<form action="/login" method="post">
+    <div class="form-group">
+        <label for="uname">用户名：</label>
+        <input type="text" id="uname" name='uname' class="form-control" placeholder="请输入账号">
+        <label for="pwd">密码：</label>
+        <input type="password" id="pwd" name='pwd' class="form-control" placeholder="请输入密码">
+    </div>
+    <button class="btn btn-success">登录</button>
+    <a href="/show-signup" class="btn btn-dark">注册</a>
+</form>
+
+{{/block}}

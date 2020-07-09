@@ -1,0 +1,16 @@
+{{extend './main.html' }}
+{{block 'main' }}
+<form action="/signup" method="post" enctype="multipart/form-data">
+    <div class="form-group">
+        <label for="uname">用户名：</label>
+        <input type="text" id="uname" name='uname' class="form-control" placeholder="请输入账号">
+        <label for="uname">用户头像：</label>
+        <input type="file" name='headimg' class="form-control">
+        <label for="email">邮箱：</label>
+        <input type="text" id="email" name='email' class="form-control" placeholder="请输入邮箱">
+        <label for="pwd">密码：</label>
+        <input type="password" id="pwd" name='pwd' class="form-control" placeholder="请输入密码">
+    </div>
+    <button class="btn btn-dark">提交</button><a href="./login" class="btn btn-dark">登陆</a>
+</form>
+{{/block}}

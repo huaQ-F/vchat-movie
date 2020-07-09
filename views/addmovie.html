@@ -1,0 +1,86 @@
+{{extend './main.html' }}
+{{block 'main' }}
+<form action="/savemovie" method="post" enctype="multipart/form-data">
+    <div class="form-group">
+        {{if aid}}
+        <input type="hidden" name="aid" value={{aid}} id="aid">
+        {{/if}}
+        <label for="apimovie">api搜索电影：</label>
+        <input type="text" id="apimovie" name='apimovie' class="form-control" placeholder="搜索名字">
+        <span id="api-prompt" style="padding-left: 20px;color:red;"></span>
+        <label for="movie">输入电影名字：</label>
+        <input type="text" id="movie" name='movie' class="form-control" placeholder="搜索名字">
+
+        <label >分类：</label>
+        {{if result.length>0}}
+        {{each result}}
+        <input type="radio" name='tag' class="custom-radio" id="{{$value._id.toString()}}" value={{$value._id.toString()}} {{if $index===0}}checked{{/if}}><label for="{{$value._id.toString()}}">{{$value.tagName}}</label>
+        <a href="/show-movietype" class="btn btn-sm btn-primary">新增分类</a>
+        {{/each}}
+        {{else}}
+        <p style="color:red;">无分类，请先添加</p>
+        {{/if}}
+        <span id="api-tag" style="padding-left: 20px;color:red;"></span>
+        <br>
+        <label for="act">演员：</label>
+        <input type="text" id="act" name='act' class="form-control">
+        <label for="rating">评级：</label>
+        <input type="number" id="rating" name='rating' class="form-control" value="0">
+        <label for="area">语种：</label>
+        <input type="text" id="area" name='area' class="form-control">
+        <label for="dir">导演：</label>
+        <input type="text" id="dir" name='dir' class="form-control">
+        <label for="desc">简介：</label>
+        <textarea type="text" id="desc" name='desc' class="form-control"></textarea></textarea>
+        <label for="file">封面：</label>
+        <input type="file" id="file" name='file' class="form-control-file" >
+        <img src="" id="cover" style="width:300px;">
+        <input type="hidden" name="cover" value="">
+        <br>
+        <label for="year">上影年份：</label>
+        <input type="text" id="year" name='year' class="form-control">
+    </div>
+    <button class="btn btn-dark mr-3">增加</button><a href="/show-movie" class="btn btn-dark">返回</a>
+</form>
+<script>
+    var aid=$('#aid').val()
+    if(aid){
+        $.get('/show-movieup?aid='+aid,function (data,msg) {
+            var result=data.result
+            $('#movie').val(result.movie)
+            $(`#${result.tag}`).attr('checked',true)
+            setDom(result)
+
+
+        })
+    }
+    $("#file").change(function(){
+        $("img").first().attr("src",URL.createObjectURL($(this)[0].files[0]));
+    });
+    $('#apimovie').blur(function () {
+        var that=$(event.target);
+        var movie=that.val()
+        if(movie)$.ajax({
+            type:'GET',
+            url:'http://zhouxunwang.cn/data/?id=62&key=VLuT+tNhHNT+jJ6L8ok2R2rAMwTgsJeZ/px07w&q='+movie,
+            success:function (data,msg,xhr) {
+                var result=JSON.parse(data).result
+                that.val(result.title);
+                $('#api-tag').text('分类参考：'+result.tag)
+                setDom(result)
+
+            }
+        })
+    })
+    function setDom(result) {
+        $('#act').val(result.act)
+        $('#rating').val(result.rating)
+        $('#area').val(result.area)
+        $('#dir').val(result.dir)
+        $('#desc').val(result.desc)
+        $('#year').val(result.year)
+        $('#cover').attr('src',result.cover)
+            .next().val(result.cover)
+    }
+</script>
+{{/block}}

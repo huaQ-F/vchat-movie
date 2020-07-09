@@ -1,0 +1,63 @@
+<nav class="navbar navbar-expand-md bg-dark navbar-dark ">
+    <a href="/" class="col-md-4 col-2 navbar-brand">like movie</a>
+    <div class="col-md-4 d-md-block d-none justify-content-center">
+        <form class="form-inline">
+            <div class="form-group">
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="搜索">
+                    <div class="input-group-append">
+                        <button type="button" class="btn input-group-text">
+                            <span class="oi oi-magnifying-glass"></span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <div id="search-content" style="z-index: 1000;position: absolute;"></div>
+    </div>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#colNavbar">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    {{if user}}
+    <div class="collapse navbar-collapse justify-content-end" id="colNavbar">
+       <div class="btn text-light mr-3">{{user.uname}}</div>
+       <a href="/login-out" id="login-out" class="btn btn-dark text-danger">注销</a>
+        <a href="/show-movietype" class="btn btn-sm btn-info ml-3">后台管理</a>
+    </div>
+    {{else}}
+    <div class="collapse navbar-collapse justify-content-end" id="colNavbar">
+        <a href="/show-login" class="btn btn-dark">登录</a>
+    </div>
+    {{/if}}
+</nav>
+<script>
+    var t;
+    $('.input-group').first().on('keyup',function () {
+        var txt=$(event.target).val()
+        var searchWidth=$(this).width()
+        clearTimeout(t)
+        t=setTimeout(function () {
+            $.ajax({
+                url:'/search',
+                type:'GET',
+                data:'txt='+txt,
+                success:function (data) {
+                    if(data.code==='001'){
+                        var html='';
+                        data.results.forEach(item=>{
+                            html+=`<a href="/movie-details/${item._id.toString()}" class="list-group-item">${item.movie}</a>`
+                        })
+                        html=`<div class="list-group">${html}</div>`;
+
+                        $('#search-content').html(html).css('width',searchWidth).show()
+
+                    }
+                }
+            })
+        },3000)
+    })
+    $('html').click(function () {
+        $('#search-content').hide()
+    })
+</script>

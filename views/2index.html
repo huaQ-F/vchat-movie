@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=320,maximum-scale=1,user-scalable=no" />
+    <title>Title</title>
+    <script src="//res.wx.qq.com/open/js/jweixin-1.6.0.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/zepto/1.2.0/zepto.js"></script>
+</head>
+<body>
+<button id="voice">click</button>
+<div style="display:none;" id="wxConf">{{wxConfig}}</div>
+<h3 id="p"></h3>
+<img src="" alt="" id="image">
+<p id="txt"></p>
+<button id="share">分享</button>
+
+<script>
+    var shareMsg={};
+    var elem=document.getElementById('wxConf').innerText
+    var wxConf=JSON.parse(elem)
+    var jsApiList=[
+        "startRecord",
+        "stopRecord",
+        "onVoiceRecordEnd",
+        "translateVoice" ,
+        "updateAppMessageShareData",
+        "updateTimelineShareData",
+        "previewImage",
+        "showAllNonBaseMenuItem",
+        "showMenuItems"
+    ]
+    wx.config({
+        debug: false,
+        appId: wxConf.appId,
+        timestamp: wxConf.timestamp,
+        nonceStr: wxConf.nonceStr,
+        signature: wxConf.signature,
+        jsApiList:jsApiList
+    });
+    wx.error(function(res){
+
+    });
+    wx.ready(function(){
+        wx.checkJsApi({
+            jsApiList:jsApiList,
+            success: function(res) {
+
+            }
+        });
+
+        var voice=true;
+        document.getElementById('voice').onclick=startvideo
+
+        $('#share').click(function () {
+
+            wx.showMenuItems({
+                menuList: ["menuItem:share:appMessage","menuItem:favorite","menuItem:share:timeline"]
+            })
+        })
+
+        // 预览图片api
+        $('#image').click(function (e) {
+            var urls=[shareMsg.cover]
+            shareMsg.act_s.forEach(function (item) {
+                urls.push(item.image)
+            })
+            wx.previewImage({
+                current: shareMsg.cover,
+                urls: urls
+            });
+        })
+
+    })
+
+    function startvideo() {
+        if(voice){
+            wx.startRecord();
+            voice=false
+        }else{
+            wx.stopRecord({
+                success: function (res) {
+
+                    var localId=res.localId;
+                    wx.translateVoice({
+                        localId: localId, // 需要识别的音频的本地Id，由录音相关接口获得
+                        isShowProgressTips: 1,
+                        success: function (res) {  // 语音识别的结果
+                            var result=res.translateResult.replace('。','')
+                            document.getElementById('p').innerText=result
+                            var url='http://zhouxunwang.cn/data/?id=62&key=VLuT+tNhHNT+jJ6L8ok2R2rAMwTgsJeZ/px07w&q='+result;
+                            $.ajax({
+                                type: 'GET',
+                                url: url,
+                                success: function (data, msg) {
+                                    var dataObj=JSON.parse(data)
+                                    $("#p").text(dataObj.result.title);
+                                    $("#txt").text(dataObj.result.desc);
+                                    $("#image").attr("src",dataObj.result.cover);
+                                    shareMsg=dataObj.result;
+                                    wx.updateAppMessageShareData({
+                                        title: dataObj.result.title,
+                                        desc: '这是一段很长的描述',
+                                        link: 'http://chat.svipss.top/ab',
+                                        imgUrl: dataObj.result.cover,
+                                        success: function () {
+                                        }
+                                    })
+                                }
+                            })
+                        }
+                    });
+                    voice=true
+                }
+            });
+
+        }
+
+    }
+</script>
+</body>
+</html>
