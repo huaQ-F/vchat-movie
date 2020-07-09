@@ -43,7 +43,9 @@ module.exports={
                     email:userInfo.unionid||userInfo.openid+'@wx.com'
                 })
                 await user.save((err) => {
-                    if(err)
+                    if(err){
+                        console.log(err)
+                    }
                 })
             }
             ctx.session.user={

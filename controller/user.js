@@ -54,9 +54,7 @@ let user={
         let user=await User.find({uname})
         if(user.length===0){
             user=new User({uname,email,pwd,head_img})
-            user.save(err=>{
-                if(err)
-            });
+            user.save();
             ctx.session.user={id:user._id,uname:user.uname,head_img:user.head_img}
             ctx.redirect('/')
         }else{

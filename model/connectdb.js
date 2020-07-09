@@ -8,7 +8,7 @@ connect.connectEnv=()=>{
         if(process.env.NODE_ENV!=='production'){
             mongoose.set('debug',true)
         }
-        const db=mongoose.connect('mongodb://localhost:8899/vchat_movies',{useNewUrlParser: true,useUnifiedTopology: true},function (err,client) {
+        const db=mongoose.connect('mongodb://localhost:27017/vchat_movies',{useNewUrlParser: true,useUnifiedTopology: true},function (err,client) {
             if(err)throw ('client fail')
             resolve(client)
         });

@@ -43,9 +43,7 @@ module.exports=index={
             ctx.body={code:'001',msg:'提交成功'}
         }else{
             let comment=new Comment({from_id,movie_id,content})
-            await comment.save((err) => {
-                if(err)
-            })
+            await comment.save()
             ctx.body={code:'001',msg:'提交成功'}
         }
     }
